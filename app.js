@@ -25,13 +25,15 @@ var iban = require('./iban.js');
 
 console.log(iban.isValid('helloWorld'));
 console.log(iban.isValid('NL60INGB0008666860'));
+console.log(iban.printFormat('be49063257519270', ' '));
+
 
 console.log('process env');
 console.log(process.env);
 
-process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
-process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
-process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
+// process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
+// process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
+// process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
 
 //const SERVER_URL = (process.env.SERVER_URL) ?
   //(process.env.SERVER_URL) :
@@ -100,11 +102,28 @@ module.exports = function(app) {
     console.log(message);
     var customPayload = conversationPayload;
 
-    //store fb user id in context variable
+    //Store fb user id in context variable
     if (typeof customPayload.context == 'undefined') {
       customPayload.context = {}
     }
     customPayload.context.messengerID = message.user
+
+    //Check if message contains IBAN number
+    if (typeof customPayload.context !== 'undefined') {
+      if (typeof customPayload.context.validate_iban !== 'undefined') {
+        customPayload.context.iban_isvalid = iban.isValid(message.text);
+        console.log('is valid');
+        if (customPayload.context.iban_isvalid) {
+          var ibannr = iban.printFormat(message.text, ' ')
+          customPayload.context.iban = ibannr
+          console.log('setnew user with IBAN');
+          console.log(ibannr);
+          database.setUser(customPayload.context.messengerID,customPayload.context.firstName,customPayload.context.lastName,' ',ibannr,false, function(err, data) {
+          });
+        }
+        delete customPayload.context.validate_iban;
+      }
+    }
 
     // If coordinates are received from facebook, store these in the .context
     var location_found = false;
@@ -197,6 +216,8 @@ module.exports = function(app) {
 // TODO: replace firstname lastname with call to User Profile API: https://developers.facebook.com/docs/messenger-platform/user-profile
           var firstName = 'test'
           var lastName = 'user'
+          conversationResponse.context.firstName = firstName
+          conversationResponse.context.lastName = lastName
           console.log('data is empty');
           database.setUser(messengerID,firstName,lastName,' ',' ',false, function(err, data) {
           });

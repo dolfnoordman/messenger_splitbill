@@ -1,4 +1,5 @@
 var ibmdb = require('ibm_db');
+var phoneNumber = require('awesome-phonenumber');
 
 var db2;
 var hasConnect = false;
@@ -30,6 +31,22 @@ function postToUsersDatabase(messID, firstName, lastName, phone, iban, verified,
     queryDatabase(query, function(err, data) {
         callback(err, data);
     });
+}
+
+// Check if number is valid, if yes update the phone number of the user
+function updatePhoneInUsersDatabase(messID, phone, callback) {
+    var pn = new phoneNumber(phone, 'BE');
+
+    if(pn.isValid()){
+        var number = pn.getNumber();
+        console.log(number);
+        var query = "UPDATE USERS SET PHONE = '" + number + "' WHERE MESSENGERID = '"+ messID + "'";
+        queryDatabase(query, function(err, data) {
+            callback(err, data);
+        });
+    } else {
+        callback('ERR: Phone number is invalid', null);
+    }
 }
 
 function postToLocationsDatabase(userID, lat, long, callback) {
@@ -126,3 +143,4 @@ exports.getLocation = selectLocationFromLocationsDatabase;
 exports.getOTP = selectOTPFromOTPDatabase;
 exports.getPaymentRequests = selectPaymentRequestFromPaymentRequestsDatabase;
 exports.getPendingPaymentRequests = selectPendingPaymentRequestFromPendingPaymentRequestsDatabase;
+exports.updatePhone = updatePhoneInUsersDatabase;

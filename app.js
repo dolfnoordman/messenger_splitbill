@@ -25,7 +25,6 @@ var iban = require('./iban.js');
 var otp = require('./OTP-module.js');
 var facebookCard = require('./facebook_card.js');
 
-console.log(facebookCard.shareIBAN('test', 'test', 'test'));
 console.log('process env');
 console.log(process.env);
 

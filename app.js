@@ -22,11 +22,11 @@ var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 
 var iban = require('./iban.js');
+var otp = require('./OTP-module.js');
 
 console.log(iban.isValid('helloWorld'));
 console.log(iban.isValid('NL60INGB0008666860'));
 console.log(iban.printFormat('be49063257519270', ' '));
-
 
 console.log('process env');
 console.log(process.env);

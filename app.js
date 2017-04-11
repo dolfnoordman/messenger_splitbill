@@ -22,10 +22,9 @@ var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 
 var iban = require('./iban.js');
+var facebookCard = require('./facebook_card.js');
 
-console.log(iban.isValid('helloWorld'));
-console.log(iban.isValid('NL60INGB0008666860'));
-
+console.log(facebookCard.shareIBAN('test', 'test', 'test'));
 console.log('process env');
 console.log(process.env);
 

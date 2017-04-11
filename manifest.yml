@@ -3,16 +3,19 @@ declared-services:
   proximus_belfius:
     label: conversation
     plan: standard
+  dashDB-Proximus-Belfius:
+    label: database
+    plan: IBM dashDB for Analytics Entry
 applications:
 - name: messenger_splitbill
   command: npm start
   path: .
-  memory: 1024M
+  memory: 512M
   instances: 1
   services:
   - proximus_belfius
+  - dashDB-Proximus-Belfius
   env:
-    NPM_CONFIG_PRODUCTION: false
     WORKSPACE_ID: 7c91d1a0-06b3-40d6-a0dc-7831e8e8013a
     FB_APP_SECRET: 3397a2b2021360dc4082b3512430cf81
     FB_ACCESS_TOKEN: EAASaD45dZCH8BAPAKkCj6oMZAyAMYdU9JGFfdEuxsabMkNSZAry4EGmWC7HHbe4C3l2tqQ763Fhc4ZCSNQJoahgP2yHOmXR4PqdmcY0aP1LrEgitNErDsKcuiQjxQl4Ga7pRIgwMNs8MfqBce9TgwMykTavSjWAnfFw1JP6wPAZDZD

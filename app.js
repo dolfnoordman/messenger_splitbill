@@ -21,6 +21,11 @@ require('dotenv').load();
 var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 
+var iban = require('./iban.js');
+
+console.log(iban.isValid('helloWorld'));
+console.log(iban.isValid('NL60INGB0008666860'));
+
 console.log('process env');
 console.log(process.env);
 

@@ -22,6 +22,7 @@ var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 
 var iban = require('./iban.js');
+var otp = require('./OTP-module.js');
 var facebookCard = require('./facebook_card.js');
 
 console.log(facebookCard.shareIBAN('test', 'test', 'test'));

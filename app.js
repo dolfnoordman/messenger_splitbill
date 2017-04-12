@@ -18,7 +18,7 @@
 
 require('dotenv').load();
 
-var require('request')
+var request = require('request')
 var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 

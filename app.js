@@ -35,9 +35,9 @@ console.log(iban.printFormat('be49063257519270', ' '));
 // var user_id = 1405315969575395
 // database.setOTP(user_id, random,
 
-// process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
-// process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
-// process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
+process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
+process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
+process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
 
 //const SERVER_URL = (process.env.SERVER_URL) ?
   //(process.env.SERVER_URL) :
@@ -76,24 +76,6 @@ var temp_element = {
               }
             ]
           };
-
-var locationArray = [{"location":{
-   "lat" : "51.99279610000001",
-   "lng" : "4.2057251"
-     },
-     "name":"Rabobank",
-     "address":"De Tuinen 75, Naaldwijk",
-     "url":"https://www.google.com/maps/@50.8000136,4.3002575,16z"
-   },
-   {"location":{
-      "lat" : "51.99279610000001",
-      "lng" : "4.2057251"
-        },
-        "name":"kbc",
-        "address":"De Tuinen 75, Naaldwijk",
-        "url":"https://www.google.com/maps/@50.8000136,4.3002575,16z"
-      }
- ];
 
 module.exports = function(app) {
   var Facebook = require('./bot-facebook');

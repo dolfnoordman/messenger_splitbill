@@ -1,4 +1,5 @@
 var ibmdb = require('ibm_db');
+var phoneNumber = require('awesome-phonenumber');
 
 var db2;
 var hasConnect = false;
@@ -32,6 +33,22 @@ function postToUsersDatabase(messID, firstName, lastName, phone, iban, verified,
     });
 }
 
+// Check if number is valid, if yes update the phone number of the user
+function updatePhoneInUsersDatabase(messID, phone, callback) {
+    var pn = new phoneNumber(phone, 'BE');
+
+    if(pn.isValid()){
+        var number = pn.getNumber();
+        console.log(number);
+        var query = "UPDATE USERS SET PHONE = '" + number + "' WHERE MESSENGERID = '"+ messID + "'";
+        queryDatabase(query, function(err, data) {
+            callback(err, data);
+        });
+    } else {
+        callback('ERR: Phone number is invalid', null);
+    }
+}
+
 function postToLocationsDatabase(userID, lat, long, callback) {
     var query = "INSERT INTO LOCATIONS (USERID, TIMESTAMP, LAT, LONG) VALUES ('"+ userID + "', current timestamp,'" + lat + "','" + long +"' );";
     queryDatabase(query, function(err, data) {
@@ -40,10 +57,22 @@ function postToLocationsDatabase(userID, lat, long, callback) {
 }
 
 function postToOTPDatabase(userID, otp, callback) {
-    var query = "INSERT INTO OTP (USERID, TIMESTAMP, OTP) VALUES ('"+ userID + "', current timestamp,'" + otp + "' );";
-    queryDatabase(query, function(err, data) {
-        callback(err, data);
-    });
+    var getQuery = "SELECT * FROM OTP WHERE USERID = '"+ userID  + "';";
+    var query;
+    queryDatabase(getQuery, function(err, data) {
+        if(!err) {
+            if(data.length > 0) {
+                query = "UPDATE OTP SET OTP = '" + otp + "', TIMESTAMP = current timestamp WHERE USERID = '"+ userID + "';";
+            } else {
+                query = "INSERT INTO OTP (USERID, TIMESTAMP, OTP) VALUES ('"+ userID + "', current timestamp,'" + otp + "' );";
+            }
+            queryDatabase(query, function(err, data) {
+                callback(err, data);
+            });
+        } else {
+            callback(err, data);
+        }
+    })
 }
 
 function postToPaymentRequestsDatabase(userID, amount, type, desc, callback) {
@@ -126,3 +155,4 @@ exports.getLocation = selectLocationFromLocationsDatabase;
 exports.getOTP = selectOTPFromOTPDatabase;
 exports.getPaymentRequests = selectPaymentRequestFromPaymentRequestsDatabase;
 exports.getPendingPaymentRequests = selectPendingPaymentRequestFromPendingPaymentRequestsDatabase;
+exports.updatePhone = updatePhoneInUsersDatabase;

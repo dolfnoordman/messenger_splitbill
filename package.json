@@ -5,6 +5,7 @@
   "main": "lib/Botkit.js",
   "dependencies": {
     "async": "^2.1.5",
+    "awesome-phonenumber": "1.2.x",
     "back": "^1.0.1",
     "body-parser": "^1.17.1",
     "botbuilder": "^3.7.0",

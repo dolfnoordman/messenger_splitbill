@@ -18,6 +18,7 @@
 
 require('dotenv').load();
 
+var require('request')
 var apimethods = require('./api_methods.js');
 var database = require('./database_module.js');
 
@@ -240,6 +241,20 @@ module.exports = function(app) {
   }
 };
 
+
+function getUserInfoFromFacebook(user_id, callback) {
+    var options = {
+        url: 'https://graph.facebook.com/v2.6/' + user_id + '?fields=first_name,last_name,locale,timezone,gender&access_token=' + process.env.FB_ACCESS_TOKEN
+    };
+
+    request(options, function(error, response, body) {
+        if(!error) {
+            callback(null, body);
+        } else {
+            callback(err, null);
+        }
+    });
+}
 /* data output*/
 /*{"location":{
    "lat" : 51.99279610000001,

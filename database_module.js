@@ -57,10 +57,22 @@ function postToLocationsDatabase(userID, lat, long, callback) {
 }
 
 function postToOTPDatabase(userID, otp, callback) {
-    var query = "INSERT INTO OTP (USERID, TIMESTAMP, OTP) VALUES ('"+ userID + "', current timestamp,'" + otp + "' );";
-    queryDatabase(query, function(err, data) {
-        callback(err, data);
-    });
+    var getQuery = "SELECT * FROM OTP WHERE USERID = '"+ userID  + "';";
+    var query;
+    queryDatabase(getQuery, function(err, data) {
+        if(!err) {
+            if(data.length > 0) {
+                query = "UPDATE OTP SET OTP = '" + otp + "', TIMESTAMP = current timestamp WHERE USERID = '"+ userID + "';";
+            } else {
+                query = "INSERT INTO OTP (USERID, TIMESTAMP, OTP) VALUES ('"+ userID + "', current timestamp,'" + otp + "' );";
+            }
+            queryDatabase(query, function(err, data) {
+                callback(err, data);
+            });
+        } else {
+            callback(err, data);
+        }
+    })
 }
 
 function postToPaymentRequestsDatabase(userID, amount, type, desc, callback) {

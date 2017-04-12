@@ -28,12 +28,16 @@ console.log(iban.isValid('helloWorld'));
 console.log(iban.isValid('NL60INGB0008666860'));
 console.log(iban.printFormat('be49063257519270', ' '));
 
-console.log('process env');
-console.log(process.env);
+// console.log('process env');
+// console.log(process.env);
 
-process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
-process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
-process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
+// var random = Math.floor(1000 + Math.random() * 9000);
+// var user_id = 1405315969575395
+// database.setOTP(user_id, random,
+
+// process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
+// process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
+// process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
 
 //const SERVER_URL = (process.env.SERVER_URL) ?
   //(process.env.SERVER_URL) :
@@ -206,6 +210,19 @@ module.exports = function(app) {
       }
     } // end of find nearest atms
 
+    // OTP check
+    if (typeof conversationResponse !== 'undefined') {
+      if (typeof conversationResponse.context !== 'undefined') {
+        if (typeof conversationResponse.context.sendTo !== 'undefined') {
+          otp.sendTo(conversationResponse.context.messengerID, conversationResponse.context.phonenr, function(err, data) {
+            console.log(data);
+            console.log('err');
+            console.log(err);
+          });
+        }
+      }
+    }
+
     // If new session started, IF NEW save user profile ELSE build session with user details from DB
     if (conversationResponse.context.system.dialog_turn_counter == 1) {
       console.log('build up session from user profile db')
@@ -224,6 +241,7 @@ module.exports = function(app) {
         } else { //update session context with data from DB
           console.log('session details retrieved from DB');
           data = data[0]
+          conversationResponse.context.userID = data.ID
           conversationResponse.context.firstName = data.LASTNAME
           conversationResponse.context.lastName = data.FIRSTNAME
           conversationResponse.context.phone = data.PHONE
@@ -236,7 +254,6 @@ module.exports = function(app) {
 
     console.log('print conversationResponse');
     console.log(conversationResponse);
-
     callback(null, conversationResponse);
   }
 };

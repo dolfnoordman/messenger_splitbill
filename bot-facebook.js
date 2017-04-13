@@ -70,6 +70,18 @@ function buildGenericTemplate(watsonData) {
     var requestButton = buildPaymentRequestButton(watsonData)
     fb_message.attachment.payload.elements[0].buttons = requestButton
     delete watsonData.context.shareRequest
+    fb_message.quick_replies = [
+        {
+          "title": "Kaart aanpassen",
+          "payload": "Edit_card",
+          "content_type": "text"
+        },
+        {
+          "title": "Verder chatten",
+          "payload": "true",
+          "content_type": "text"
+        }
+      ]
   }
 
   console.log(fb_message);
@@ -93,7 +105,7 @@ function buildQuickReplies(watsonData) {
 function buildPaymentRequestButton(watsonData) {
 
   //write payment request to db
-  var userID = watsonData.context.userID
+  var userID = watsonData.context.messengerID
   var amount = watsonData.context.request_amount
   var desc = watsonData.context.request_message
   database.setPaymentRequest(userID, amount, '', desc, function(err, data){
@@ -101,14 +113,14 @@ function buildPaymentRequestButton(watsonData) {
 
   var ref = {}
   ref.IntentID = 'SettleUp'
-  ref.payID = watsonData.context.messengerID
+  ref.payID = userID
   ref = encodeURIComponent(JSON.stringify(ref))
   console.log('ref');
   console.log(ref);
 
   var button = {}
   button.type = "web_url"
-  button.url = "http://m.me/239266609873681?ref=" + ref
+  button.url = "http://m.me/1398550450167709?ref=" + ref
   button.title = "Betaal je vriend 💸"
 
   var element = {}

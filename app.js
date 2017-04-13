@@ -31,9 +31,16 @@ console.log(iban.printFormat('be49063257519270', ' '));
 // console.log('process env');
 // console.log(process.env);
 
-// var random = Math.floor(1000 + Math.random() * 9000);
-// var user_id = 1405315969575395
-// database.setOTP(user_id, random,
+var phone = '9812basjdgh505'
+var messID = '1405315969575395'
+database.updatePhone(messID, phone, function(err,data){
+  if (err) {
+    console.log('error');
+    console.log(err);
+  } else {
+    console.log(data);
+  }
+})
 
 process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
 process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
@@ -86,34 +93,56 @@ module.exports = function(app) {
   // Customize your Watson Middleware object's before and after callbacks.
   middleware.before = function(message, conversationPayload, callback) {
     console.log(message);
+    console.log(conversationPayload);
     var customPayload = conversationPayload;
+    var location_found = false;
 
-    //Store fb user id in context variable
+    //Store fb messengerID in context when new session is started
     if (typeof customPayload.context == 'undefined') {
       customPayload.context = {}
-    }
-    customPayload.context.messengerID = message.user
-
-    //Check if message contains IBAN number
-    if (typeof customPayload.context !== 'undefined') {
-      if (typeof customPayload.context.validate_iban !== 'undefined') {
-        customPayload.context.iban_isvalid = iban.isValid(message.text);
-        console.log('is valid');
-        if (customPayload.context.iban_isvalid) {
-          var ibannr = iban.printFormat(message.text, ' ')
-          customPayload.context.iban = ibannr
-          console.log('setnew user with IBAN');
-          console.log(ibannr);
-          database.setUser(customPayload.context.messengerID,customPayload.context.firstName,customPayload.context.lastName,' ',ibannr,false, function(err, data) {
-          });
-        }
-        delete customPayload.context.validate_iban;
+      customPayload.context.messengerID = message.user
+      console.log("customPayload_new_session");
+      console.log(customPayload);
+      callback(null, customPayload);
+    } else if (typeof customPayload.context.validate_iban !== 'undefined') {
+    //Check if message contains IBAN number when context.validate_iban
+      customPayload.context.iban_isvalid = iban.isValid(message.text);
+      console.log('is valid');
+      if (customPayload.context.iban_isvalid) {
+        var ibannr = iban.printFormat(message.text, ' ')
+        customPayload.context.iban = ibannr
+        console.log('setnew user with IBAN');
+        console.log(ibannr);
+        database.setUser(customPayload.context.messengerID,customPayload.context.firstName,customPayload.context.lastName,' ',ibannr,false, function(err, data) {
+        });
       }
-    }
-
-    // If coordinates are received from facebook, store these in the .context
-    var location_found = false;
-    if (typeof message.attachments !== 'undefined') {
+      delete customPayload.context.validate_iban;
+      console.log("customPayload_validate_iban");
+      console.log(customPayload);
+      callback(null, customPayload);
+    } else if (typeof customPayload.context.validate_phone !== 'undefined') {
+      //Check if message contains valid phone number when context.validate_phone
+        var phone = message.text
+        var messID = customPayload.context.messengerID
+        database.updatePhone(messID, phone, function(err,data){
+          if (err) {
+            console.log('error find in phone');
+            customPayload.context.phone_isvalid = false
+            delete customPayload.context.validate_phone;
+            console.log("customPayload_validate_phone");
+            console.log(customPayload);
+            callback(null, customPayload);
+          } else {
+            console.log('phone is valid');
+            customPayload.context.phone_isvalid = true
+            delete customPayload.context.validate_phone;
+            console.log("customPayload_validate_phone");
+            console.log(customPayload);
+            callback(null, customPayload);
+          }
+        })
+    } else if (typeof message.attachments !== 'undefined') {
+      // If coordinates are received from facebook, store these in the .context
       console.log("attachements found");
       var location = message.attachments[0];
       if (typeof location.payload.coordinates !== 'undefined') {
@@ -129,17 +158,27 @@ module.exports = function(app) {
             customPayload.context.coordinates = temp_coordinate;
             customPayload.context.coordinates.lat = lat;
             customPayload.context.coordinates.long = long;
-            console.log("create customPayload");
 
+            console.log("customPayload_coordinates");
+            console.log(customPayload);
+            callback(null, customPayload);
           }
         }
-      }
-    } // end of storing coordinates in .context
-
-    console.log("customPayload");
-    console.log(customPayload);
-    //Facebook.bot.reply(message,{text: "message"})
-    callback(null, customPayload);
+      } //TO BE CONTINUED HERE CHECK OTP IN WATSON
+    // } else if (typeof customPayload.context.validate_otp !== 'undefined') {
+    //   var user_id = customPayload.context.user_id
+    //   var otp = customPayload.context.otp
+    //   otp.check(user_id, otp, function(err,data){
+    //     customPayload.context.otp_isvalid = data
+    //     console.log("customPayload otp validation");
+    //     console.log(customPayload);
+    //     callback(null, customPayload);
+    //   })
+    } else {    // end of storing coordinates in .context
+      console.log("customPayload normal");
+      console.log(customPayload);
+      callback(null, customPayload);
+    }
   }
 
   middleware.after = function(message, conversationResponse, callback) {
@@ -195,9 +234,10 @@ module.exports = function(app) {
     // OTP check
     if (typeof conversationResponse !== 'undefined') {
       if (typeof conversationResponse.context !== 'undefined') {
-        if (typeof conversationResponse.context.sendTo !== 'undefined') {
-          otp.sendTo(conversationResponse.context.messengerID, conversationResponse.context.phonenr, function(err, data) {
+        if (typeof conversationResponse.context.sendOTP !== 'undefined') {
+          otp.sendTo(conversationResponse.context.userID, conversationResponse.context.phone, function(err, data) {
             console.log(data);
+            conversationResponse.context.otp = data
             console.log('err');
             console.log(err);
           });
@@ -254,12 +294,3 @@ function getUserInfoFromFacebook(user_id, callback) {
         }
     });
 }
-/* data output*/
-/*{"location":{
-   "lat" : 51.99279610000001,
-   "lng" : 4.2057251
- },
- "name":"Rabobank",
- "address":"De Tuinen 75, Naaldwijk",
- "url":"https://www.google.com/maps/@50.8000136,4.3002575,16z"
-}*/

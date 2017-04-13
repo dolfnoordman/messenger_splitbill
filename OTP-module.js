@@ -12,7 +12,7 @@ function sendTo(user_id, phoneNr, callback) {
             if(!err) {
                 sendOTPMessage(phoneNr, otp, function(err, res, body) {
                     if(!err) {
-                        callback(null, body);
+                        callback(null, otp);
                     } else {
                         callback(err, null);
                     }

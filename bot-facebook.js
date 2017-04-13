@@ -44,14 +44,20 @@ var temp_quickreply = {
   ]
 };
 
-// controller.api.thread_settings.greeting('Hallo, ik ben SplitBot');
-// controller.api.thread_settings.get_started('GET_STARTED');
-// controller.api.thread_settings.menu([
-//             {
-//               "title":"Vind Bankautomaat",
-//               "type":"postback",
-//               "payload":"FIND_ATM"}
-//             ]);
+controller.api.thread_settings.greeting('Hallo {{user_first_name}}, ik ben SplitBot');
+controller.api.thread_settings.get_started('GET_STARTED');
+controller.api.thread_settings.menu(
+  [{
+      "title": "Vind Bankautomaat",
+      "type": "postback",
+      "payload": "FIND_ATM"
+  }, {
+      "title": "Betalingsverzoek",
+      "type": "postback",
+      "payload": "SEND_REQUEST"
+  }]
+)
+console.log('finished building menu');
 
 function buildGenericTemplate(watsonData) {
   console.log(watsonData.context);
@@ -120,7 +126,7 @@ function buildPaymentRequestButton(watsonData) {
 
   var button = {}
   button.type = "web_url"
-  button.url = "http://m.me/239266609873681?ref=" + ref
+  button.url = "http://m.me/1398550450167709?ref=" + ref
   button.title = "Betaal je vriend 💸"
 
   var element = {}
@@ -190,7 +196,9 @@ function CreateSettleUpReply(payID, message){
       console.log(data1);
       var firstName = data[0].FIRSTNAME
       var iban = data[0].IBAN
-      var amount = data1[0].AMOUNT
+      if (typeof data1[0] != 'undefined' & typeof data1[0].AMOUNT != 'undefined' ){
+        var amount = data1[0].AMOUNT
+      }
 
       fbreply = "Hallo! Blijkbaar moet jij " + firstName + " nog " + amount + "€ terugbetalen. Hier heb je zijn IBAN:"
       bot.reply(message, fbreply);

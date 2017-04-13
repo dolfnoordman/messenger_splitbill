@@ -31,20 +31,9 @@ console.log(iban.printFormat('be49063257519270', ' '));
 // console.log('process env');
 // console.log(process.env);
 
-var phone = '9812basjdgh505'
-var messID = '1405315969575395'
-database.updatePhone(messID, phone, function(err,data){
-  if (err) {
-    console.log('error');
-    console.log(err);
-  } else {
-    console.log(data);
-  }
-})
-
-process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
-process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
-process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
+// process.env.FB_APP_SECRET = 'b18f64ddb479f16c6151c25f0dd28874'
+// process.env.FB_ACCESS_TOKEN = 'EAALJ7SiOs5YBAHSZBZCRSBT3w7s535nzNmyGOhIQETZAeZCquxVbyhmjzn8nSzr80t0lXTMzz7HT7ZBgZCyICEamntDjIqHTbtiDIK3gZCsLc07b3IpadC5XKETIZCEyHjC1YKvBrt7ZAgHXuFCf1mVUZAY5AWFiUYQOtVZBZBe8BXqoOwZDZD'
+// process.env.FB_VERIFY_TOKEN = 'mySecretAccessToken'
 
 //const SERVER_URL = (process.env.SERVER_URL) ?
   //(process.env.SERVER_URL) :
@@ -164,16 +153,7 @@ module.exports = function(app) {
             callback(null, customPayload);
           }
         }
-      } //TO BE CONTINUED HERE CHECK OTP IN WATSON
-    // } else if (typeof customPayload.context.validate_otp !== 'undefined') {
-    //   var user_id = customPayload.context.user_id
-    //   var otp = customPayload.context.otp
-    //   otp.check(user_id, otp, function(err,data){
-    //     customPayload.context.otp_isvalid = data
-    //     console.log("customPayload otp validation");
-    //     console.log(customPayload);
-    //     callback(null, customPayload);
-    //   })
+      }
     } else {    // end of storing coordinates in .context
       console.log("customPayload normal");
       console.log(customPayload);

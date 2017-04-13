@@ -51,9 +51,7 @@ function getNearestBank(latitude,longitude, callback) {
          bank.location = bankfound.geometry.location
          bank.name = bankfound.name
          bank.address = bankfound.vicinity
-         var destination = bankfound.geometry.location.lat + ',' + bankfound.geometry.location.lng
-        //  https://www.google.com/maps?saddr=50.4,4.3&daddr=50.5,4.3
-         var tempurl = 'https://www.google.com/maps?saddr=' + origin + '&daddr=' + destination + '&dirflg=w'
+         var tempurl = 'https://www.google.com/maps?saddr=' + origin + '&daddr=' + bank.address + '&dirflg=w'
          bank.url = tempurl
          bank.distance = getDistanceFromLatLonInKm(latitude, longitude, bankfound.geometry.location.lat, bankfound.geometry.location.lng)
          console.log(bank.distance);

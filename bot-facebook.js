@@ -196,8 +196,10 @@ function CreateSettleUpReply(payID, message){
       console.log(data1);
       var firstName = data[0].FIRSTNAME
       var iban = data[0].IBAN
-      if (typeof data1[0] != 'undefined' & typeof data1[0].AMOUNT != 'undefined' ){
-        var amount = data1[0].AMOUNT
+      if (typeof data1[0] != 'undefined'){
+         if (typeof data1[0].AMOUNT != 'undefined'){
+           var amount = data1[0].AMOUNT
+         }
       }
 
       fbreply = "Hallo! Blijkbaar moet jij " + firstName + " nog " + amount + "€ terugbetalen. Hier heb je zijn IBAN:"

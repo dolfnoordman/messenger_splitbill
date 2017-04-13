@@ -188,65 +188,58 @@ module.exports = function(app) {
 
     //if find_atm is set as true within the watson.context, then find the nearest atms based on users location;
     //Coordinates should be given during previous interaction. (todo: include error/user reprompt check on coordinates indeed received)
-    if (typeof conversationResponse !== 'undefined') {
-      if (typeof conversationResponse.context !== 'undefined') {
-        if (typeof conversationResponse.context.find_atm !== 'undefined') {
-          // create template
-          console.log('start of getNearestAtm appjs');
-          apimethods.getNearestBank(conversationResponse.context.coordinates.lat, conversationResponse.context.coordinates.long, function(atms){
-            console.log('return callback bank');
-            console.log(atms);
-            locationArray = atms
-            var fb_message = {};
-            fb_message.attachment = JSON.parse(JSON.stringify(temp_attachment));
-            var obj2 = JSON.parse(JSON.stringify(temp_attachment));
-            for (var i = 0; i < locationArray.length; i++) {
-              var fb_element = JSON.parse(JSON.stringify(temp_element));
-              //var fb_element = temp_element;
-              fb_element.title = locationArray[i].name + ' - ' + locationArray[i].address;
-              fb_element.image_url = SERVER_URL + "/assets/bank.png";
-              var knownbanks = ['kbc','ing','bnp','belfius']
-              for (var banks in knownbanks) {
-                if (locationArray[i].name.toLowerCase().includes(knownbanks[banks])) {
-                  fb_element.image_url = SERVER_URL + "/assets/" + knownbanks[banks] + ".png";
-                }
-              }
-
-              fb_element.buttons[0].url = locationArray[i].url;
-              fb_element.subtitle = locationArray[i].distance;
-              fb_message.attachment.payload.elements.push(fb_element);
-              console.log(fb_element);
-
+    if (typeof conversationResponse.context.find_atm !== 'undefined') {
+      // create template
+      console.log('start of getNearestAtm appjs');
+      apimethods.getNearestBank(conversationResponse.context.coordinates.lat, conversationResponse.context.coordinates.long, function(atms){
+        console.log('return callback bank');
+        console.log(atms);
+        var locationArray = atms
+        var fb_message = {};
+        fb_message.attachment = JSON.parse(JSON.stringify(temp_attachment));
+        var obj2 = JSON.parse(JSON.stringify(temp_attachment));
+        for (var i = 0; i < locationArray.length; i++) {
+          var fb_element = JSON.parse(JSON.stringify(temp_element));
+          //var fb_element = temp_element;
+          fb_element.title = locationArray[i].name + ' - ' + locationArray[i].address;
+          fb_element.image_url = SERVER_URL + "/assets/bank.png";
+          var knownbanks = ['kbc','ing','bnp','belfius']
+          for (var banks in knownbanks) {
+            if (locationArray[i].name.toLowerCase().includes(knownbanks[banks])) {
+              fb_element.image_url = SERVER_URL + "/assets/" + knownbanks[banks] + ".png";
             }
+          }
 
-            console.log(fb_message);
-
-            Facebook.bot.reply(message, fb_message);
-            fb_element = null;
-            //delete fb_message.attachment.payload.elements;
-            delete conversationResponse.context.find_atm;
-          })
+          fb_element.buttons[0].url = locationArray[i].url;
+          fb_element.subtitle = locationArray[i].distance;
+          fb_message.attachment.payload.elements.push(fb_element);
+          console.log(fb_element);
 
         }
-      }
-    } // end of find nearest atms
 
-    // OTP check
-    if (typeof conversationResponse !== 'undefined') {
-      if (typeof conversationResponse.context !== 'undefined') {
-        if (typeof conversationResponse.context.sendOTP !== 'undefined') {
-          otp.sendTo(conversationResponse.context.userID, conversationResponse.context.phone, function(err, data) {
-            console.log(data);
-            conversationResponse.context.otp = data
-            console.log('err');
-            console.log(err);
-          });
-        }
-      }
-    }
+        console.log(fb_message);
 
-    // If new session started, IF NEW save user profile ELSE build session with user details from DB
-    if (conversationResponse.context.system.dialog_turn_counter == 1) {
+        Facebook.bot.reply(message, fb_message);
+        fb_element = null;
+
+        delete conversationResponse.context.find_atm;
+        console.log('print conversationResponse atm');
+        console.log(conversationResponse);
+        callback(null, conversationResponse);
+      })
+      // end of find nearest atms
+      // ELSE if sentOTP is set
+    } else if (typeof conversationResponse.context.sendOTP !== 'undefined') {
+      otp.sendTo(conversationResponse.context.userID, conversationResponse.context.phone, function(err, data) {
+        console.log('otp send');
+        console.log(data);
+        conversationResponse.context.otp = String(data)
+        delete conversationResponse.context.sendOTP
+        console.log('print conversationResponse otp');
+        console.log(conversationResponse);
+        callback(null, conversationResponse);
+      });
+    } else if (conversationResponse.context.system.dialog_turn_counter == 1) {
       console.log('build up session from user profile db')
       var messengerID = conversationResponse.context.messengerID
       database.getUser(messengerID, function(err, data) {
@@ -260,6 +253,9 @@ module.exports = function(app) {
           console.log('data is empty');
           database.setUser(messengerID,firstName,lastName,' ',' ',false, function(err, data) {
           });
+          console.log('print conversationResponse new user');
+          console.log(conversationResponse);
+          callback(null, conversationResponse);
         } else { //update session context with data from DB
           console.log('session details retrieved from DB');
           data = data[0]
@@ -270,13 +266,16 @@ module.exports = function(app) {
           conversationResponse.context.iban = data.IBAN
           conversationResponse.context.verified = data.VERIFIED
           console.log(conversationResponse.context);
+          console.log('print conversationResponse existing user new session');
+          console.log(conversationResponse);
+          callback(null, conversationResponse);
         }
-      });
-    } // end of initializing session
-
-    console.log('print conversationResponse');
-    console.log(conversationResponse);
-    callback(null, conversationResponse);
+      });// end of initializing session
+    } else { //Normal response
+      console.log('print normal conversationResponse');
+      console.log(conversationResponse);
+      callback(null, conversationResponse);
+    }
   }
 };
 

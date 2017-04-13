@@ -126,7 +126,7 @@ function buildPaymentRequestButton(watsonData) {
 
   var button = {}
   button.type = "web_url"
-  button.url = "http://m.me/1398550450167709?ref=" + ref
+  button.url = "http://m.me/239266609873681?ref=" + ref
   button.title = "Betaal je vriend 💸"
 
   var element = {}

@@ -124,6 +124,7 @@ module.exports = function(app) {
           } else {
             console.log('phone is valid');
             customPayload.context.phone_isvalid = true
+            customPayload.context.phone = phone
             delete customPayload.context.validate_phone;
             console.log("customPayload_validate_phone");
             console.log(customPayload);

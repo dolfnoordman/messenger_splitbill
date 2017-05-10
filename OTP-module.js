@@ -8,8 +8,8 @@ const MESSAGE = 'This is your one-time password @OTP@.\\n\\nThank you,\\nSplitbi
 // Send OTP message for a user to
 function sendTo(user_id, phoneNr, callback) {
     createOTP(function(otp) {
-        addOTPtoOTPDatabase(user_id, otp, function(err) {
-            if(!err) {
+        // addOTPtoOTPDatabase(user_id, otp, function(err) {
+        //     if(!err) {
                 sendOTPMessage(phoneNr, otp, function(err, res, body) {
                     if(!err) {
                         callback(null, otp);
@@ -17,10 +17,10 @@ function sendTo(user_id, phoneNr, callback) {
                         callback(err, null);
                     }
                 })
-            } else {
-                callback(err, null);
-            }
-        })
+            // } else {
+            //     callback(err, null);
+            // }
+        // })
     })
 }
 
